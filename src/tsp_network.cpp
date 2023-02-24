@@ -5,7 +5,7 @@
  *  Create Time: 24/02/2023 16:04
  */
 
-#include "network.hpp"
+#include "tsp_network.hpp"
 
 #include <sstream>
 #include <vector>

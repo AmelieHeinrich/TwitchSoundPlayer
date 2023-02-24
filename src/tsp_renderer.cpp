@@ -5,12 +5,30 @@
  *  Create Time: 24/02/2023 16:38
  */
 
-#include "renderer.hpp"
+#include "tsp_application.hpp"
+#include "tsp_renderer.hpp"
+
+#include <cstdint>
 
 namespace tsp
 {
     LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
     {
+        switch (Message)
+        {
+            case WM_SIZE:
+            {
+                RECT Rectangle;
+                GetClientRect(Window, &Rectangle);
+                uint32_t Width = Rectangle.right - Rectangle.left;
+                uint32_t Height = Rectangle.bottom - Rectangle.top;
+
+                Application* App = Application::GetApplication();
+                if (App->GetGPU())
+                    App->GetGPU()->Resize(Width, Height);
+            } break;
+        }
+
         return DefWindowProc(Window, Message, WParam, LParam);
     }
 
