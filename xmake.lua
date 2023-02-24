@@ -7,5 +7,5 @@
 
 target("Twitch Sound Player")
     add_files("src/*.cpp")
-    add_syslinks("Winmm", "Ws2_32", "gdi32", "user32", "kernel32")
+    add_syslinks("Winmm", "Ws2_32", "gdi32", "user32", "kernel32", "dsound")
     set_rundir(".")

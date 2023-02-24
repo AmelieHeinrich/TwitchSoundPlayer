@@ -53,7 +53,16 @@ namespace tsp
             MessageBoxA(nullptr, "Cannot connect to twitch server!", "Error", MB_ICONERROR);
             WSACleanup();
         }
+    }
 
+    Network::~Network()
+    {
+        closesocket(mConnectSocket);
+        WSACleanup();
+    }
+
+    void Network::Connect()
+    {
         std::string SendToken = "PASS " + mToken + "\r\n";
         std::string SendNickname = "NICK " + mChannel + "\r\n";
         std::string SendChannel = "JOIN #" + mChannel + "\r\n";
@@ -61,12 +70,6 @@ namespace tsp
         send(mConnectSocket, SendToken.c_str(), SendToken.length(), 0);
         send(mConnectSocket, SendNickname.c_str(), SendNickname.length(), 0);
         send(mConnectSocket, SendChannel.c_str(), SendChannel.length(), 0);
-    }
-
-    Network::~Network()
-    {
-        closesocket(mConnectSocket);
-        WSACleanup();
     }
 
     std::string Network::Receive()

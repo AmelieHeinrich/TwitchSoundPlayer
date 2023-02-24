@@ -9,11 +9,17 @@
 #include <regex>
 
 #include "network.hpp"
+#include "audio.hpp"
 
 int main()
 {
-    tsp::Network* Network = new tsp::Network("oauth:ewtwfhl2uwrebp2imqdpremhc86lww", "amelie_dev");
+    tsp::AudioContext* Context = new tsp::AudioContext();
 
+    tsp::Network* Network = new tsp::Network();
+    Network->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
+    Network->SetChannel("amelie_dev");
+
+    Network->Connect();
     (void)Network->Receive();
     (void)Network->Receive();
 
@@ -25,10 +31,13 @@ int main()
             std::smatch Match;
             std::regex_search(Reply, Match, Research);
 
-            std::cout << Match[2] << ": " << Match[3] << std::endl;
+            std::cout << Match[1] << ": " << Match[3] << std::endl;
         }
+
+        Context->Update();
     }
     
     delete Network;
+    delete Context;
     return (0);
 }

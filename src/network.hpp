@@ -18,9 +18,13 @@ namespace tsp
     class Network
     {
     public:
-        Network(std::string Token, std::string Channel);
+        Network(std::string Token = "", std::string Channel = "");
         ~Network();
 
+        void SetToken(const std::string& Token) { mToken = Token; }
+        void SetChannel(const std::string& Channel) { mChannel = Channel; }
+        
+        void Connect();
         std::string Receive();
     private:
         SOCKET mConnectSocket = INVALID_SOCKET;
