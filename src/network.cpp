@@ -70,6 +70,9 @@ namespace tsp
         send(mConnectSocket, SendToken.c_str(), SendToken.length(), 0);
         send(mConnectSocket, SendNickname.c_str(), SendNickname.length(), 0);
         send(mConnectSocket, SendChannel.c_str(), SendChannel.length(), 0);
+        
+        (void)Receive();
+        (void)Receive();
     }
 
     std::string Network::Receive()
