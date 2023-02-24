@@ -11,6 +11,7 @@
 #include <Windows.h>
 #include <string>
 #include <sstream>
+#include <regex>
 
 int main()
 {
@@ -64,14 +65,24 @@ int main()
     send(ConnectSocket, Nickname.c_str(), Nickname.length(), 0);
     send(ConnectSocket, Channel.c_str(), Channel.length(), 0);
 
+    {
+        std::vector<char> Buffer = std::vector<char>(1024);
+        recv(ConnectSocket, Buffer.data(), 1024, NULL);
+        recv(ConnectSocket, Buffer.data(), 1024, NULL);
+    }
+
     while (true) {
-        constexpr int BufferLength = 100000;
-        char Buffer[BufferLength] = {};
+        std::vector<char> Buffer = std::vector<char>(1024);
+        int BytesReceived = recv(ConnectSocket, Buffer.data(), 1024, NULL);
+        std::string Reply = std::string(Buffer.begin(), Buffer.begin() + BytesReceived);
 
-        int BytesReceived = recv(ConnectSocket, Buffer, BufferLength, NULL);
-        Buffer[BytesReceived] = '\0';
+        if (Reply.length() > 0) {
+            std::regex Research("!(.+)@.+ PRIVMSG #([^\\s]+) :(.*)");
+            std::smatch Match;
+            std::regex_search(Reply, Match, Research);
 
-        std::cout << Buffer << std::endl;
+            std::cout << Match[2] << ": " << Match[3] << std::endl;
+        }
     }
 
     WSACleanup();
