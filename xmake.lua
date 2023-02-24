@@ -7,8 +7,14 @@
 
 add_rules("mode.debug", "mode.release")
 
+target("ImGui")
+    set_kind("static")
+    add_files("external/*.cpp")
+    add_syslinks("user32", "d3d11", "dxgi")
+
 target("Twitch Sound Player")
     add_files("src/*.cpp")
+    add_deps("ImGui")
     add_syslinks("Winmm", "Ws2_32", "gdi32", "user32", "kernel32", "dsound", "d3d11", "dxgi")
     set_rundir(".")
 
