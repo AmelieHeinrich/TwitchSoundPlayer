@@ -16,6 +16,7 @@ target("Twitch Sound Player")
     add_files("src/*.cpp")
     add_deps("ImGui")
     add_syslinks("Winmm", "Ws2_32", "gdi32", "user32", "kernel32", "dsound", "d3d11", "dxgi")
+    add_includedirs("external")
     set_rundir(".")
 
     if is_mode("debug") then

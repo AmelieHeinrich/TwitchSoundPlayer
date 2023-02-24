@@ -10,6 +10,8 @@
 #include <regex>
 #include <iostream>
 
+#include <imgui.h>
+
 namespace tsp
 {
     void NetworkThread(const std::shared_ptr<tsp::Network>& Network)
@@ -45,6 +47,7 @@ namespace tsp
             mRenderer->Update();
 
             mGPU->BeginFrame();
+            ImGui::ShowDemoWindow();
             mGPU->EndFrame();
             mGPU->Present();
         }

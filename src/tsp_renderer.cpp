@@ -10,10 +10,15 @@
 
 #include <cstdint>
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace tsp
 {
     LRESULT CALLBACK WindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
     {
+        if (ImGui_ImplWin32_WndProcHandler(Window, Message, WParam, LParam))
+            return 1;
+
         switch (Message)
         {
             case WM_SIZE:

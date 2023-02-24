@@ -7,6 +7,10 @@
 
 #include "tsp_gpu.hpp"
 
+#include <imgui.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+
 namespace tsp
 {
     const D3D_DRIVER_TYPE DriverTypes[] =
@@ -43,10 +47,30 @@ namespace tsp
         mWidth = Rect.right - Rect.left;
         mHeight = Rect.bottom - Rect.top;
         Resize(mWidth, mHeight);
+
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& IO = ImGui::GetIO();
+        IO.DisplaySize = ImVec2(mWidth, mHeight);
+        IO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        ImGui::StyleColorsDark();
+        ImGuiStyle& Style = ImGui::GetStyle();
+        if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            Style.WindowRounding = 0.0f;
+            Style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
+        ImGui_ImplWin32_EnableDpiAwareness();
+        ImGui_ImplDX11_Init(mDevice, mDeviceContext);
+        ImGui_ImplWin32_Init(mRenderWindow);
     }
 
     GPU::~GPU()
     {
+        ImGui_ImplDX11_Shutdown();
+        ImGui_ImplWin32_Shutdown();
+        ImGui::DestroyContext();
+
         if (mRenderTargetView)
             mRenderTargetView->Release();
         if (mSwapChainBuffer)
@@ -120,12 +144,29 @@ namespace tsp
         Viewport.MinDepth = 0.0f;
         Viewport.MaxDepth = 1.0f;
 
+        float Clear[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
         mDeviceContext->RSSetViewports(1, &Viewport);
         mDeviceContext->OMSetRenderTargets(1, &mRenderTargetView, NULL);
+        mDeviceContext->ClearRenderTargetView(mRenderTargetView, Clear);
+
+        ImGui_ImplDX11_NewFrame();
+        ImGui_ImplWin32_NewFrame();
+        ImGui::NewFrame();
     }
 
     void GPU::EndFrame()
     {
-        return;
+        ImGuiIO& IO = ImGui::GetIO();
+        IO.DisplaySize = ImVec2(mWidth, mHeight);
+
+        ImGui::Render();
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+        if (IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
     }
 }
