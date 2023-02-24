@@ -19,6 +19,8 @@ namespace tsp
 
         bool IsOpen();
         void Update();
+
+        HWND& GetWindow() { return mWindow; }
     private:
         HWND mWindow;
     };

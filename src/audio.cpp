@@ -9,13 +9,16 @@
 
 namespace tsp
 {
-    AudioContext::AudioContext()
+    AudioContext::AudioContext(HWND Window)
     {
         HRESULT Result = DirectSoundCreate8(nullptr, &mDevice, nullptr);
         if (FAILED(Result)) {
             MessageBoxA(nullptr, "Failed to initialise audio interface!", "Error", MB_ICONERROR);
         }
-        // TODO(amelie.h): Set cooperative level
+        Result = mDevice->SetCooperativeLevel(Window, DSSCL_PRIORITY);
+        if (FAILED(Result)) {
+            MessageBoxA(nullptr, "Failed to set audio cooperative level!", "Error", MB_ICONERROR);
+        }
 
         WAVEFORMATEX WaveFormat = {};
         WaveFormat.wFormatTag = WAVE_FORMAT_PCM;

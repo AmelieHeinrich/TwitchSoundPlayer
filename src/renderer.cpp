@@ -24,7 +24,7 @@ namespace tsp
         RegisterClassA(&WindowClass);
 
         mWindow = CreateWindowA(WindowClass.lpszClassName, "Twitch Sound Player | <Direct3D 11>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 1280, 720, nullptr, nullptr, WindowClass.hInstance, nullptr);
-        ShowWindow(mWindow, SW_SHOWMAXIMIZED);
+        ShowWindow(mWindow, SW_SHOWDEFAULT);
     }
 
     Renderer::~Renderer()

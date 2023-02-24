@@ -14,7 +14,7 @@ namespace tsp
     class AudioContext
     {
     public:
-        AudioContext();
+        AudioContext(HWND Window);
         ~AudioContext();
 
         void Update();

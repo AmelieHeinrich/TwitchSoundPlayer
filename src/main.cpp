@@ -29,8 +29,8 @@ void UpdateChat(const std::shared_ptr<tsp::Network>& Network)
 
 int main()
 {
-    std::unique_ptr<tsp::AudioContext> Audio = std::make_unique<tsp::AudioContext>();
     std::unique_ptr<tsp::Renderer> Renderer = std::make_unique<tsp::Renderer>();
+    std::unique_ptr<tsp::AudioContext> Audio = std::make_unique<tsp::AudioContext>(Renderer->GetWindow());
     std::shared_ptr<tsp::Network> Network = std::make_shared<tsp::Network>();
 
     Network->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
@@ -43,7 +43,7 @@ int main()
         Renderer->Update();
         Audio->Update();
     }
-
     NetworkThread.join();
+    
     return (0);
 }
