@@ -17,6 +17,7 @@ namespace tsp
         drwav Wave;
         if (!drwav_init_file(&Wave, Path.c_str(), nullptr)) {
             MessageBoxA(nullptr, "Failed to load audio file!", "Error!", 0);
+            return;
         }
 
         mSampleRate = Wave.sampleRate;
@@ -75,7 +76,8 @@ namespace tsp
 
     void AudioFile::Play()
     {
-        mBuffer->Play(0, 0, 0);
+        if (mBuffer)
+            mBuffer->Play(0, 0, 0);
     }
 
     void AudioFile::SetVolume(float Volume)

@@ -84,6 +84,8 @@ namespace tsp
     {
         std::vector<char> Buffer = std::vector<char>(1024);
         int BytesReceived = recv(mConnectSocket, Buffer.data(), 1024, NULL);
-        return std::string(Buffer.begin(), Buffer.begin() + BytesReceived);
+        if (BytesReceived != 0)
+            return std::string(Buffer.begin(), Buffer.begin() + BytesReceived);
+        return "";
     }
 }

@@ -16,6 +16,7 @@
 #include "tsp_renderer.hpp"
 #include "tsp_gpu.hpp"
 #include "tsp_config_parser.hpp"
+#include "tsp_audio_registry.hpp"
 
 namespace tsp
 {
@@ -31,17 +32,17 @@ namespace tsp
         auto GetGPU() { return mGPU; }
         auto GetAudioContext() { return mAudioContext; }
         auto GetNetwork() { return mNetwork; }
+        auto GetConfig() { return mConfig; }
 
         static Application* GetApplication();
     private:
         std::shared_ptr<Renderer> mRenderer;
         std::shared_ptr<GPU> mGPU;
         std::shared_ptr<AudioContext> mAudioContext;
+        std::shared_ptr<AudioRegistry> mAudioRegistry;
         std::shared_ptr<Network> mNetwork;
         std::shared_ptr<Config> mConfig;
         std::thread mNetworkJob;
-
-        AudioFile mTestFile;
 
         void BeginDockspace();
         void OnUI();

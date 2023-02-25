@@ -23,7 +23,6 @@ namespace tsp
                 std::regex Research("!(.+)@.+ PRIVMSG #([^\\s]+) :(.*)");
                 std::smatch Match;
                 std::regex_search(Reply, Match, Research);
-                std::cout << Match[3] << std::endl;
                 Application::GetApplication()->SendCommand(Match[3]);
             }
         }
@@ -36,6 +35,9 @@ namespace tsp
         mAudioContext = std::make_shared<tsp::AudioContext>(mRenderer->GetWindow());
         mNetwork = std::make_shared<tsp::Network>();
         mConfig = std::make_shared<tsp::Config>("config.tsp");
+        mAudioRegistry = std::make_shared<tsp::AudioRegistry>();
+
+        mAudioRegistry->Load();
 
         mNetwork->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
         mNetwork->SetChannel("amelie_dev");
@@ -43,8 +45,6 @@ namespace tsp
 
         mNetworkJob = std::thread(NetworkThread, mNetwork);
         mNetworkJob.detach();
-
-        mTestFile.Load("sounds/meow.wav");
     }
 
     void Application::Update()
@@ -67,14 +67,37 @@ namespace tsp
     void Application::OnUI()
     {
         ImGui::Begin("Commands");
-        for (auto Variable : mConfig->Variables) {
-            if (ImGui::TreeNodeEx(Variable.Name.c_str(), ImGuiTreeNodeFlags_Framed))
+
+        if (ImGui::Button("Reload")) {
+            mAudioRegistry->Unload();
+            mAudioRegistry->Load();
+        }
+
+        for (auto Variable = mConfig->Variables.begin(); Variable != mConfig->Variables.end(); ++Variable) {
+            if (ImGui::TreeNodeEx(Variable->Name.c_str(), ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
             {
-                ImGui::Text(Variable.Command.c_str());
-                ImGui::Text(Variable.Path.c_str());
+                {
+                    char Buffer[512] = {};
+                    strcat(Buffer, Variable->Name.c_str());
+                    ImGui::InputText("Name", Buffer, 512);
+                    Variable->Name = Buffer;
+                }
+                {
+                    char Buffer[512] = {};
+                    strcat(Buffer, Variable->Command.c_str());
+                    ImGui::InputText("Command", Buffer, 512);
+                    Variable->Command = Buffer;
+                }
+                {
+                    char Buffer[512];
+                    strcat(Buffer, Variable->Path.c_str());
+                    ImGui::InputText("Path", Buffer, 512);
+                    Variable->Path = Buffer;
+                }
                 ImGui::TreePop();
             }
         }
+
         ImGui::End();
     }
 
@@ -139,16 +162,12 @@ namespace tsp
 
     void Application::SendCommand(const std::string& Command)
     {
-        std::cout << "RECEIVED COMAMND: " << Command << std::endl;
-        if (Command.compare("!meow") == 0) {
-            std::cout << "Meow" << std::endl;
-            mTestFile.Play();
-        }
+        mAudioRegistry->PlayCommand(Command);
     }
 
     void Application::Exit()
     {
-        mTestFile.Unload();
+        mAudioRegistry->Unload();
         mConfig->Write("config.tsp");
     }
 

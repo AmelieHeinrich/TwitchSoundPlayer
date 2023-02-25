@@ -24,6 +24,7 @@ namespace tsp
     public:
         Config(const std::string& Path);
         void Write(const std::string& Path);
+        void Add(tsp_variable Variable) { Variables.push_back(Variable); }
 
         std::vector<tsp_variable> Variables;
     };
