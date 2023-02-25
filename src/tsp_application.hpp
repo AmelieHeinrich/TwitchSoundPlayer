@@ -14,6 +14,7 @@
 #include "tsp_audio.hpp"
 #include "tsp_renderer.hpp"
 #include "tsp_gpu.hpp"
+#include "tsp_config_parser.hpp"
 
 namespace tsp
 {
@@ -35,6 +36,11 @@ namespace tsp
         std::shared_ptr<GPU> mGPU;
         std::shared_ptr<AudioContext> mAudioContext;
         std::shared_ptr<Network> mNetwork;
+        std::shared_ptr<Config> mConfig;
         std::thread mNetworkJob;
+
+        void BeginDockspace();
+        void OnUI();
+        void EndDockspace();
     };
 };

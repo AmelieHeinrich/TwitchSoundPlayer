@@ -32,6 +32,7 @@ namespace tsp
         mGPU = std::make_shared<tsp::GPU>(mRenderer->GetWindow());
         mAudioContext = std::make_shared<tsp::AudioContext>(mRenderer->GetWindow());
         mNetwork = std::make_shared<tsp::Network>();
+        mConfig = std::make_shared<tsp::Config>("config.tsp");
 
         mNetwork->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
         mNetwork->SetChannel("supercqrry_");
@@ -47,14 +48,91 @@ namespace tsp
             mRenderer->Update();
 
             mGPU->BeginFrame();
-            ImGui::ShowDemoWindow();
+
+            this->BeginDockspace();
+            this->OnUI();
+            this->EndDockspace();
+            
             mGPU->EndFrame();
             mGPU->Present();
         }
     }
 
+    void Application::OnUI()
+    {
+        ImGui::Begin("Commands");
+        for (auto Variable : mConfig->Variables) {
+            if (ImGui::TreeNodeEx(Variable.Name.c_str(), ImGuiTreeNodeFlags_Framed))
+            {
+                ImGui::Text(Variable.Command.c_str());
+                ImGui::Text(Variable.Path.c_str());
+                ImGui::TreePop();
+            }
+        }
+        ImGui::End();
+    }
+
+    void Application::BeginDockspace()
+    {
+        // Begin dockspace
+        static bool DockspaceOpen = true;
+		static bool FullscreenPersistant = true;
+		static ImGuiDockNodeFlags DockspaceFlags = ImGuiDockNodeFlags_None;
+
+        ImGuiWindowFlags WindowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (FullscreenPersistant)
+		{
+			ImGuiViewport* Viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(Viewport->Pos);
+			ImGui::SetNextWindowSize(Viewport->Size);
+			ImGui::SetNextWindowViewport(Viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			WindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			WindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		}
+
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &DockspaceOpen, WindowFlags);
+		ImGui::PopStyleVar();
+
+        ImGui::PopStyleVar(2);
+
+        ImGuiIO& IO = ImGui::GetIO();
+		ImGuiStyle& Style = ImGui::GetStyle();
+		float MinWinSizeX = Style.WindowMinSize.x;
+		Style.WindowMinSize.x = 370.0f;
+		if (IO.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID DockspaceID = ImGui::GetID("MyDockSpace");
+			ImGui::DockSpace(DockspaceID, ImVec2(0.0f, 0.0f), DockspaceFlags);
+		}
+
+        Style.WindowMinSize.x = MinWinSizeX;
+
+        if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+					mConfig->Write("config.tsp");
+
+				if (ImGui::MenuItem("Exit"))
+                    DestroyWindow(mRenderer->GetWindow());
+			}
+
+			ImGui::EndMenuBar();
+		}
+    }
+
+    void Application::EndDockspace()
+    {
+        ImGui::End();
+    }
+
     void Application::Exit()
     {
+        mConfig->Write("config.tsp");
         mNetworkJob.join();
     }
 

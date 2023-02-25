@@ -45,11 +45,11 @@ namespace tsp
         while (std::getline(Stream, Line))
         {
             std::string Name = GetSubstringBefore(Line, '=');
-            std::string Command = GetSubstringBefore(GetSubstringAfter(Line, ','), '=');
-            std::string Path = GetSubstringAfter(Line, '=');
+            std::string Command = GetSubstringBefore(GetSubstringAfter(Line, '='), ',');
+            std::string Path = GetSubstringAfter(Line, ',');
 
             tsp_variable Variable = { Name, Command, Path };
-            mVariables.push_back(Variable);
+            Variables.push_back(Variable);
         }
 
         Stream.close();
@@ -57,8 +57,8 @@ namespace tsp
 
     void Config::Write(const std::string& Path)
     {
-        std::ofstream Stream(Path);
-        for (auto Variable : mVariables) {
+        std::ofstream Stream(Path, std::ios_base::trunc);
+        for (auto Variable : Variables) {
             Stream << Variable.Name << "=" << Variable.Command << "," << Variable.Path << std::endl;
         }
         Stream.close();
