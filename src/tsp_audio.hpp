@@ -21,8 +21,8 @@ namespace tsp
 
         void SetVolume(float Volume) { mVolume = Volume; }
     private:
-        IDirectSound8 *mDevice;
-        IDirectSoundBuffer *mPrimaryBuffer;
+        IDirectSound8 *mDevice = nullptr;
+        IDirectSoundBuffer *mPrimaryBuffer = nullptr;
         float mVolume;      
     };
 };

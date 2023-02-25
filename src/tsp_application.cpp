@@ -34,7 +34,7 @@ namespace tsp
         mNetwork = std::make_shared<tsp::Network>();
 
         mNetwork->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
-        mNetwork->SetChannel("amelie_dev");
+        mNetwork->SetChannel("supercqrry_");
         mNetwork->Connect();
 
         mNetworkJob = std::thread(NetworkThread, mNetwork);
