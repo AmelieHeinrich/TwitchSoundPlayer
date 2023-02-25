@@ -10,19 +10,22 @@
 #include <regex>
 #include <iostream>
 
-#include <imgui.h>
+#include <imgui/imgui.h>
 
 namespace tsp
 {
     void NetworkThread(const std::shared_ptr<tsp::Network>& Network)
     {
-        std::string Reply = Network->Receive();
+        while (Application::GetApplication()->GetRenderer()->IsOpen()) {
+            std::string Reply = Network->Receive();
 
-        if (Reply.length() > 0) {
-            std::regex Research("!(.+)@.+ PRIVMSG #([^\\s]+) :(.*)");
-            std::smatch Match;
-            if (std::regex_search(Reply, Match, Research) == true)
-                std::cout << Match[1] << ": " << Match[3] << std::endl;
+            if (Reply.length() > 0) {
+                std::regex Research("!(.+)@.+ PRIVMSG #([^\\s]+) :(.*)");
+                std::smatch Match;
+                std::regex_search(Reply, Match, Research);
+                std::cout << Match[3] << std::endl;
+                Application::GetApplication()->SendCommand(Match[3]);
+            }
         }
     }
 
@@ -35,10 +38,13 @@ namespace tsp
         mConfig = std::make_shared<tsp::Config>("config.tsp");
 
         mNetwork->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
-        mNetwork->SetChannel("supercqrry_");
+        mNetwork->SetChannel("amelie_dev");
         mNetwork->Connect();
 
         mNetworkJob = std::thread(NetworkThread, mNetwork);
+        mNetworkJob.detach();
+
+        mTestFile.Load("sounds/meow.wav");
     }
 
     void Application::Update()
@@ -119,7 +125,8 @@ namespace tsp
 
 				if (ImGui::MenuItem("Exit"))
                     DestroyWindow(mRenderer->GetWindow());
-			}
+                ImGui::EndMenu();
+            }
 
 			ImGui::EndMenuBar();
 		}
@@ -130,10 +137,19 @@ namespace tsp
         ImGui::End();
     }
 
+    void Application::SendCommand(const std::string& Command)
+    {
+        std::cout << "RECEIVED COMAMND: " << Command << std::endl;
+        if (Command.compare("!meow") == 0) {
+            std::cout << "Meow" << std::endl;
+            mTestFile.Play();
+        }
+    }
+
     void Application::Exit()
     {
+        mTestFile.Unload();
         mConfig->Write("config.tsp");
-        mNetworkJob.join();
     }
 
     Application* Application::GetApplication()

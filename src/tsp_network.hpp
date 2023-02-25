@@ -25,6 +25,7 @@ namespace tsp
         void SetChannel(const std::string& Channel) { mChannel = Channel; }
         
         void Connect();
+        void Shutdown();
         std::string Receive();
     private:
         SOCKET mConnectSocket = INVALID_SOCKET;

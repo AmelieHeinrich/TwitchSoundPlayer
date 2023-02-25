@@ -75,6 +75,11 @@ namespace tsp
         (void)Receive();
     }
 
+    void Network::Shutdown()
+    {
+        shutdown(mConnectSocket, SD_RECEIVE);
+    }
+
     std::string Network::Receive()
     {
         std::vector<char> Buffer = std::vector<char>(1024);

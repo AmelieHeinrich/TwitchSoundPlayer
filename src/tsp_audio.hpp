@@ -21,8 +21,10 @@ namespace tsp
 
         void SetVolume(float Volume) { mVolume = Volume; }
     private:
+        friend class AudioFile;
+        
         IDirectSound8 *mDevice = nullptr;
         IDirectSoundBuffer *mPrimaryBuffer = nullptr;
-        float mVolume;      
+        float mVolume;
     };
 };
