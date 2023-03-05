@@ -9,6 +9,7 @@
 
 #include <regex>
 #include <iostream>
+#include <fstream>
 
 #include <imgui/imgui.h>
 
@@ -39,9 +40,21 @@ namespace tsp
 
         mAudioRegistry->Load();
 
-        mNetwork->SetToken("oauth:ewtwfhl2uwrebp2imqdpremhc86lww");
-        mNetwork->SetChannel("amelie_dev");
+        std::ifstream EnvStream("login.env");
+        if (!EnvStream.is_open()) {
+            MessageBoxA(nullptr, "Failed to load env file!", "Error!", MB_ICONERROR);
+        }
+
+        std::vector<std::string> Lines;
+        std::string Line;
+        while (std::getline(EnvStream, Line))
+            Lines.push_back(Line);
+
+        mNetwork->SetToken(Lines[0]);
+        mNetwork->SetChannel(Lines[1]);
         mNetwork->Connect();
+
+        EnvStream.close();
 
         mNetworkJob = std::thread(NetworkThread, mNetwork);
         mNetworkJob.detach();
@@ -89,7 +102,7 @@ namespace tsp
                     Variable->Command = Buffer;
                 }
                 {
-                    char Buffer[512];
+                    char Buffer[512] = {};
                     strcat(Buffer, Variable->Path.c_str());
                     ImGui::InputText("Path", Buffer, 512);
                     Variable->Path = Buffer;
@@ -105,54 +118,54 @@ namespace tsp
     {
         // Begin dockspace
         static bool DockspaceOpen = true;
-		static bool FullscreenPersistant = true;
-		static ImGuiDockNodeFlags DockspaceFlags = ImGuiDockNodeFlags_None;
+        static bool FullscreenPersistant = true;
+        static ImGuiDockNodeFlags DockspaceFlags = ImGuiDockNodeFlags_None;
 
         ImGuiWindowFlags WindowFlags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		if (FullscreenPersistant)
-		{
-			ImGuiViewport* Viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(Viewport->Pos);
-			ImGui::SetNextWindowSize(Viewport->Size);
-			ImGui::SetNextWindowViewport(Viewport->ID);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			WindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			WindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		}
+        if (FullscreenPersistant)
+        {
+            ImGuiViewport* Viewport = ImGui::GetMainViewport();
+            ImGui::SetNextWindowPos(Viewport->Pos);
+            ImGui::SetNextWindowSize(Viewport->Size);
+            ImGui::SetNextWindowViewport(Viewport->ID);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            WindowFlags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            WindowFlags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+        }
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &DockspaceOpen, WindowFlags);
-		ImGui::PopStyleVar();
+        ImGui::Begin("DockSpace Demo", &DockspaceOpen, WindowFlags);
+        ImGui::PopStyleVar();
 
         ImGui::PopStyleVar(2);
 
         ImGuiIO& IO = ImGui::GetIO();
-		ImGuiStyle& Style = ImGui::GetStyle();
-		float MinWinSizeX = Style.WindowMinSize.x;
-		Style.WindowMinSize.x = 370.0f;
-		if (IO.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-		{
-			ImGuiID DockspaceID = ImGui::GetID("MyDockSpace");
-			ImGui::DockSpace(DockspaceID, ImVec2(0.0f, 0.0f), DockspaceFlags);
-		}
+        ImGuiStyle& Style = ImGui::GetStyle();
+        float MinWinSizeX = Style.WindowMinSize.x;
+        Style.WindowMinSize.x = 370.0f;
+        if (IO.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+        {
+            ImGuiID DockspaceID = ImGui::GetID("MyDockSpace");
+            ImGui::DockSpace(DockspaceID, ImVec2(0.0f, 0.0f), DockspaceFlags);
+        }
 
         Style.WindowMinSize.x = MinWinSizeX;
 
         if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
-					mConfig->Write("config.tsp");
+        {
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Save", "Ctrl+S"))
+                    mConfig->Write("config.tsp");
 
-				if (ImGui::MenuItem("Exit"))
+                if (ImGui::MenuItem("Exit"))
                     DestroyWindow(mRenderer->GetWindow());
                 ImGui::EndMenu();
             }
 
-			ImGui::EndMenuBar();
-		}
+            ImGui::EndMenuBar();
+        }
     }
 
     void Application::EndDockspace()

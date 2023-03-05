@@ -7,7 +7,7 @@
 
 #include "tsp_application.hpp"
 
-int main()
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     tsp::Application* App = tsp::Application::GetApplication();
     App->Init();
